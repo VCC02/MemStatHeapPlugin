@@ -1,6 +1,6 @@
 {
     Copyright (C) 2026 VCC
-    creation date: 2026
+    creation date: 05 Nov 2026
     initial release date: 05 Nov 2026
 
     author: VCC
@@ -38,7 +38,7 @@ procedure LoadLstFile(AFileName: Pointer; AFileNameLen: DWord); cdecl;
 procedure LoadHexFile(AFileName: Pointer; AFileNameLen: DWord); cdecl;
 function GetMemEntryCount: DWord; cdecl;
 procedure GetMemEntry(ACallback: TGetMemEntryCallback; AEntryIndex: DWord); cdecl;  //AEntryIndex can go from 0 to GetMemEntryCount - 1
-procedure GetStatistics(ACallback: TGetPluginStatisticsCallback); cdecl;
+procedure GetStatistics(ACallback: TGetPluginStatisticsCallback; AMemTableInfo: TMemTableInfo); cdecl;
 
 
 implementation
@@ -213,14 +213,18 @@ begin
 end;
 
 
-procedure GetStatistics(ACallback: TGetPluginStatisticsCallback); cdecl;
+procedure GetStatistics(ACallback: TGetPluginStatisticsCallback; AMemTableInfo: TMemTableInfo); cdecl;
 var
   TempStatistics: string;
 begin
   if ACallback = nil then
     Exit;
 
-  TempStatistics := 'Hello from MemStatHeap plugin.';
+  if not HeapFound then
+    TempStatistics := 'No heap found.'
+  else
+    TempStatistics := 'Found heap at address $' + IntToHex(HeapAddr, 8) + ', of ' + IntToStr(HeapSize) + ' bytes.';
+
   ACallback(@TempStatistics[1], Length(TempStatistics));
   TempStatistics := '';
 end;
